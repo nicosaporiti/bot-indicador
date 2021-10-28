@@ -10,7 +10,7 @@ const twitterClient = new TwitterClient({
   accessTokenSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
 });
 
-cron.schedule('0 4 * * * ', () => {
+cron.schedule('0 4 * * monday-friday', () => {
   axios.get("https://mindicador.cl/api").then((res) => {
   const { uf, dolar, ipc, tpm, libra_cobre, bitcoin } = res.data;
   const date = uf.fecha.split(/[-,T]| /);
