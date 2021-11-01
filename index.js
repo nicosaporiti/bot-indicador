@@ -10,43 +10,63 @@ const twitterClient = new TwitterClient({
   accessTokenSecret: process.env.TWITTER_ACCESS_TOKEN_SECRET,
 });
 
-cron.schedule('0 4 * * monday-friday', () => {
-  axios.get("https://mindicador.cl/api").then((res) => {
-  const { uf, dolar, ipc, tpm, libra_cobre, bitcoin } = res.data;
-  const date = uf.fecha.split(/[-,T]| /);
-  const year = date[0];
-  const monthD = date[1];
-  const day = date[2];
-  const ipcMonth = ipc.fecha.split("-")[1];
-  const ipcYear = ipc.fecha.split("-")[0];
-  let tweet = `
-    Esto es un 🤖 para 🇨🇱
-    
-    IPC (${ipcMonth}/${ipcYear}) = ${ipc.valor} %
-    
-    Valores al ${day}/${monthD}/${year}
-    UF = ${uf.valor}
-    Dólar = ${dolar.valor}
-    TPM = ${tpm.valor}
-    Cobre = ${libra_cobre.valor}
-    #Bitcoin = ${bitcoin.valor}
-    `;
+cron.schedule(
+  "0 4 * * monday-friday",
+  () => {
+    let buda = "https://www.buda.com/api/v2/markets/btc-usdc/ticker";
+    let miIndicador = " https://mindicador.cl/api";
 
-  twitterClient.tweets
-    .statusesUpdate({
-      status: tweet,
-    })
-    .then((response) => {
-      console.log("Tweeted!", response);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-    
-});;
-}, {
-  scheduled: true,
-  timezone: "America/Sao_Paulo"
-});
+    const requestOne = axios.get(buda);
+    const requestTwo = axios.get(miIndicador);
 
+    axios
+      .all([requestOne, requestTwo])
+      .then(
+        axios.spread((requestOne, requestTwo) => {
+          const btcPrice = requestOne.data.ticker.last_price[0];
+          const { uf, dolar, ipc, libra_cobre, tpm } = requestTwo.data;
+          const date = uf.fecha.split(/[-,T]| /);
+          const year = date[0];
+          const monthD = date[1];
+          const day = date[2];
+          const ipcMonth = ipc.fecha.split("-")[1];
+          const ipcYear = ipc.fecha.split("-")[0];
 
+          let tweet = `
+      Indicadores por 🤖 para 🇨🇱
+      
+      Valores al ${day}/${monthD}/${year}
+  
+      UF = ${uf.valor}
+      Dólar = ${dolar.valor}
+      Cobre = ${libra_cobre.valor}
+      #Bitcoin = USDC ${btcPrice} (Buda.com)
+  
+      IPC (${ipcMonth}/${ipcYear}) = ${ipc.valor} %
+      TPM = ${tpm.valor}
+  
+      `;
+
+          // use/access the results
+          twitterClient.tweets
+            .statusesUpdate({
+              status: tweet,
+            })
+            .then((response) => {
+              console.log("Tweeted!", response);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        })
+      )
+      .catch((errors) => {
+        // react on errors.
+        console.error(errors);
+      });
+  },
+  {
+    scheduled: true,
+    timezone: "America/Sao_Paulo",
+  }
+);
