@@ -43,7 +43,7 @@ cron.schedule(
       #Bitcoin = USDC ${btcPrice} (Buda.com)
   
       IPC (${ipcMonth}/${ipcYear}) = ${ipc.valor} %
-      TPM = ${tpm.valor}
+      TPM = ${tpm.valor} %
   
       `;
 
