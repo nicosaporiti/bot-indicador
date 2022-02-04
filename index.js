@@ -16,6 +16,15 @@ cron.schedule(
 let buda = 'https://www.buda.com/api/v2/markets/btc-usdc/ticker';
 let miIndicador = ' https://mindicador.cl/api';
 
+const initValue = {
+  initUf: 30991.74,
+  initDolar: 850.25,
+  initCobre: 4.35,
+  initBtc: 47209,
+  initIpc: 0.5,
+  initTpm: 4
+}
+
 const requestOne = axios.get(buda);
 const requestTwo = axios.get(miIndicador);
 
@@ -36,20 +45,36 @@ axios
         return n.toLocaleString('es-CL');
       };
 
+      const yearToDate = (i, l) => {
+        const ytd = ((l, i) -1) * 100;
+        let arrow;
+
+        if(ytd > 0) {
+          arrow = '⬆️ '
+        } else {
+          arrow = '🔻 '
+        }
+
+
+        return  (arrow + ytd.toLocaleString('es-CL', {maximumFractionDigits: 2}));
+      }
+
       let tweet = `
-      Indicadores por 🤖 para 🇨🇱
+      Indicadores 🇨🇱
       
-      Valores al ${day}/${monthD}/${year}
+      Valores al ${day}/${monthD}/${year} (YTD)
   
-      UF = ${formatNumber(uf.valor)}
-      Dólar = ${formatNumber(dolar.valor)}
-      Cobre = ${formatNumber(libra_cobre.valor)}
-      #Bitcoin = USDC ${formatNumber(parseFloat(btcPrice))} (Buda.com)
+      UF = ${formatNumber(uf.valor)} (${yearToDate(uf.valor / initValue.initUf)} %)
+      Dólar = ${formatNumber(dolar.valor)} (${yearToDate(dolar.valor / initValue.initDolar)} %)
+      Cobre = ${formatNumber(libra_cobre.valor)} (${yearToDate(libra_cobre.valor / initValue.initCobre)} %)
+      #Bitcoin = USDC ${formatNumber(parseFloat(btcPrice))} (${yearToDate(btcPrice / initValue.initBtc)} %)
   
-      IPC (${ipcMonth}/${ipcYear}) = ${formatNumber(ipc.valor)} %
-      TPM = ${formatNumber(tpm.valor)} %
+      IPC (${ipcMonth}/${ipcYear}) = ${formatNumber(ipc.valor)} % 
+      TPM = ${formatNumber(tpm.valor)} % 
   
       `;
+
+      console.log(tweet)
 
       // use/access the results
       twitterClient.tweets
