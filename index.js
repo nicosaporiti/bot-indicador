@@ -11,7 +11,7 @@ const twitterClient = new TwitterClient({
 });
 
 cron.schedule(
-  "0 4 * * monday-friday",
+  "0 8 * * monday-friday",
   () => {
 let buda = 'https://www.buda.com/api/v2/markets/btc-usdc/ticker';
 let miIndicador = ' https://mindicador.cl/api';
