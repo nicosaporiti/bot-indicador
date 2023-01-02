@@ -17,12 +17,12 @@ let buda = 'https://www.buda.com/api/v2/markets/btc-usdc/ticker';
 let miIndicador = ' https://mindicador.cl/api';
 
 const initValue = {
-  initUf: 30991.74,
-  initDolar: 850.25,
-  initCobre: 4.35,
-  initBtc: 47209,
-  initIpc: 0.5,
-  initTpm: 4
+  initUf: 35110.98,
+  initDolar: 859.51,
+  initCobre: 3.82,
+  initBtc: 16677.61,
+  initIpc: 1.0,
+  initTpm: 11.25
 }
 
 const requestOne = axios.get(buda);
